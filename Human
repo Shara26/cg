@@ -1,0 +1,203 @@
+#include<stdio.h>
+#include<GL/glut.h>
+#include<math.h>
+#include<stdlib.h>
+
+
+int x,y;
+int xmin,ymin,xmax,ymax;
+int xa,ya,xb,yb;
+void bresLine(int xa,int ya,int xb,int yb)
+{
+int dx,dy,d,c,r,f;
+dx=xb-xa;
+dy=yb-ya;
+if( abs(dx) >abs(dy))
+{
+d = 2* abs(dy) -abs(dx);
+if(dx>0)
+{
+c=xa;
+r=ya;
+f=xb;
+}
+else
+{
+c=xb;
+r=yb;
+f=xa;
+}
+while(c<f)
+{
+if(d<0)
+{
+c=c+1;
+d=d+ 2*abs(dy);
+}
+else
+{
+c=c+1;
+if((dx>0 && dy>0)||(dx<0 && dy<0))
+{
+r=r+1;
+}
+else
+{
+r=r-1;
+}
+d=d+2*abs(dy)-2*abs(dx);
+}
+glVertex2d(c,r);
+}
+}
+if( abs(dy) >abs(dx))
+{
+d = 2* abs(dx) -abs(dy);
+if(dy>0)
+{
+c=xa;
+r=ya;
+f=yb;
+}
+else
+{
+c=xb;
+r=yb;
+f=ya;
+}
+while(r<f)
+{
+if(d<0)
+{
+r=r+1;
+d=d+ 2*abs(dx);
+}
+else
+{
+r=r+1;
+if((dx>0 && dy>0)||(dx<0 && dy<0))
+{
+c=c+1;
+}
+else
+{
+c=c-1;
+}
+d=d+2*abs(dx)-2*abs(dy);
+}
+glVertex2d(c,r);
+}
+}
+}
+void bresc(int xc,int yc,int r)
+{
+int x,y,d;
+x=0;
+y=r;
+d=3-2*r;
+do{
+glVertex2d(xc+x,yc+y);
+glVertex2d(xc+x,yc-y);
+glVertex2d(xc+y,yc+x);
+glVertex2d(xc-y,yc+x);
+glVertex2d(xc-x,yc+y);
+glVertex2d(xc+y,yc-x);
+glVertex2d(xc-x,yc-y);
+glVertex2d(xc-y,yc-x);
+
+if(d<0)
+{
+x=x+1;
+d=d+4*x+6;
+}
+else
+{
+x=x+1;
+y=y-1;
+d=d+4*x-4*y+10;
+}
+}
+while(x<=y);
+}
+
+
+void drawhuman()
+{
+glBegin(GL_POINTS);
+//face
+
+bresc(320,380,40);
+bresc(305,390,5);
+bresc(335,390,5);
+
+bresLine(315,370,325,370);
+bresLine(325,370,320,385);
+bresLine(320,385,315,370);
+
+bresLine(310,362,330,362);
+bresLine(330,362,330,352);
+bresLine(330,352,310,352);
+bresLine(310,352,310,362);
+
+//neck
+bresLine(312,340,312,310);
+
+bresLine(328,310,328,340);
+
+//body
+bresLine(280,310,360,310);
+bresLine(360,310,360,230);
+bresLine(360,230,280,230);
+bresLine(280,230,280,310);
+
+//lefthand
+bresLine(280,310,240,280);
+bresLine(240,280,248,270);
+bresLine(248,270,280,283);
+//righthand
+bresLine(360,310,400,280);
+bresLine(400,280,392,270);
+bresLine(392,270,360,283);
+//leg
+xa=280;
+ya=180;
+xb=310;
+yb=230;
+bresLine(280,230,280,180);
+bresLine(280,180,310,180);
+bresLine(310,180,310,230);
+
+bresLine(330,230,330,180);
+bresLine(330,180,360,180);
+bresLine(360,180,360,230);
+glEnd();
+}
+
+
+void draw()
+{
+glClear(GL_COLOR_BUFFER_BIT);
+  glColor3f(0, 0, 0);
+glBegin(GL_POINTS);
+
+drawhuman();
+
+glEnd();
+glFlush();
+
+}
+
+int main(int argc,char ** argv)
+{
+
+glutInit(&argc,argv);
+glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+glutInitWindowPosition(0,0);
+glutInitWindowSize(640,480);
+glutCreateWindow("OBJECT-->Color-->Clip");
+glClearColor(1,1,1,0);
+gluOrtho2D(0,640,0,480);
+glutDisplayFunc(draw);
+glutMainLoop();
+return 0;
+}
