@@ -1,0 +1,162 @@
+#include <GL/glut.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int xa, ya, xb, yb;
+int clickCount = 0;
+int ch = 1; // 1=simple, 2=dotted, 3=dashed, 4=dot-dashed
+int i = 0;
+
+void bline(int xa, int ya, int xb, int yb) {
+    int dx = xb - xa;
+    int dy = yb - ya;
+    int d;
+    int c, r, f;
+
+    if (abs(dx) > abs(dy)) {
+        d = 2 * abs(dy) - abs(dx);
+        if (dx > 0) {
+            c = xa;
+            r = ya;
+            f = xb;
+        } else {
+            c = xb;
+            r = yb;
+            f = xa;
+        }
+
+        while (f > c) {
+            if (ch == 1) {
+                glVertex2d(c, r);
+            } else if (ch == 2) {
+                if (i % 2 == 0) glVertex2d(c, r);
+            } else if (ch == 3) {
+                if (i % 6 < 4) glVertex2d(c, r);
+            } else if (ch == 4) {
+                if (i % 12 < 6) glVertex2d(c, r);
+            }
+            i++;
+
+            if (d < 0) {
+                c++;
+                d += 2 * abs(dy);
+            } else {
+                c++;
+                if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0)) {
+                    r++;
+                } else {
+                    r--;
+                }
+                d += 2 * abs(dy) - 2 * abs(dx);
+            }
+        }
+
+    } else {
+        d = 2 * abs(dx) - abs(dy);
+        if (dy > 0) {
+            c = xa;
+            r = ya;
+            f = yb;
+        } else {
+            c = xb;
+            r = yb;
+            f = ya;
+        }
+
+        while (f > r) {
+            if (ch == 1) {
+                glVertex2d(c, r);
+            } else if (ch == 2) {
+                if (i % 2 == 0) glVertex2d(c, r);
+            } else if (ch == 3) {
+                if (i % 6 < 4) glVertex2d(c, r);
+            } else if (ch == 4) {
+                if (i % 12 < 6) glVertex2d(c, r);
+            }
+            i++;
+
+            if (d < 0) {
+                r++;
+                d += 2 * abs(dx);
+            } else {
+                r++;
+                if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0)) {
+                    c++;
+                } else {
+                    c--;
+                }
+                d += 2 * abs(dx) - 2 * abs(dy);
+            }
+        }
+    }
+}
+
+void Draw() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_POINTS);
+
+    // Draw axes
+    bline(320, 0, 320, 480);
+    bline(0, 240, 640, 240);
+
+    // Draw line if both clicks are done
+    if (clickCount == 0) {
+        i = 0;
+        bline(xa, ya, xb, yb);
+    }
+
+    glEnd();
+    glFlush();
+}
+
+void Mouse(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        y = 480 - y;
+
+        if (clickCount == 0) {
+            xa = x;
+            ya = y;
+            clickCount = 1;
+            printf("First click: (%d, %d)\n", xa, ya);
+        } else {
+            xb = x;
+            yb = y;
+            clickCount = 0;
+            printf("Second click: (%d, %d)\n", xb, yb);
+            glutPostRedisplay();
+        }
+    }
+}
+
+int main(int argc, char **argv) {
+    printf("Select the line style:\n");
+    printf("1 - Simple\n");
+    printf("2 - Dotted\n");
+    printf("3 - Dashed\n");
+    printf("4 - Dot-Dashed\n");
+    printf("Enter your choice: ");
+    scanf("%d", &ch); // User input for line style
+
+    if (ch < 1 || ch > 4) {
+        printf("Invalid choice! Defaulting to Simple.\n");
+        ch = 1; // Default to simple line if invalid input
+    }
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(640, 480);
+    glutInitWindowPosition(0, 0);
+    glutCreateWindow("Bresenham Line Drawing - Two Click");
+
+    glClearColor(1, 1, 1, 0);
+    glColor3f(0, 0, 0);
+    gluOrtho2D(0, 640, 0, 480);
+
+    glutDisplayFunc(Draw);
+    glutMouseFunc(Mouse);
+
+    glutMainLoop();
+    return 0;
+}
+
