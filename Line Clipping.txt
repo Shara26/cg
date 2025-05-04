@@ -1,0 +1,215 @@
+#include<stdio.h>
+#include<GL/glut.h>
+
+int xmin,ymin,xmax,ymax;
+int xa,ya,xb,yb;
+
+int ROUND(float a)
+{
+ return (int) (a+0.5);
+ }
+
+
+void ddaline(int xa,int ya,int xb,int yb)
+{
+   int dx,dy,steps;
+   
+   dx=xb-xa;
+   dy=yb-ya;
+   
+   if(abs(dx)>abs(dy))
+   {
+    steps=abs(dx);
+    }
+    else
+    {
+    steps=abs(dy);
+    }
+    
+   float xinc,yinc;
+   
+   xinc=(float) dx/steps;
+   yinc=(float) dy/steps;
+   
+   float x=xa,y=ya;
+   glVertex2d(xa,ya);
+   
+   int i;
+   for( i=0;i<steps;i++)
+   {
+     x=x+xinc;
+     y=y+yinc;
+    glVertex2d(ROUND(x),ROUND(y));
+     }
+     
+  }
+   
+   
+   
+   
+   
+struct lineclipping
+{
+  int x,y;
+  int outcode[4];
+  }p1,p2;
+  
+  
+ void calculate(struct lineclipping *p)
+  {
+    if(p->x < xmin)
+     {
+       p->outcode[3]=1;
+        }
+        else
+        {
+        p->outcode[3]=0;
+        }
+     if(p->x > xmax)
+     {
+       p->outcode[2]=1;
+        }
+        else
+        {
+        p->outcode[2]=0;
+        }
+     if(p->y < ymin)
+     {
+       p->outcode[1]=1;
+        }
+        else
+        {
+        p->outcode[1]=0;
+        }
+     if(p->y > ymax)
+     {
+       p->outcode[0]=1;
+        }
+        else
+        {
+        p->outcode[0
+        ]=0;
+        }
+}
+
+
+
+
+
+
+
+
+void draw()
+{
+glClear(GL_COLOR_BUFFER_BIT);
+glBegin(GL_POINTS);
+
+glColor3f(1,0,0);
+ddaline(p1.x,p1.y,p2.x,p2.y);
+
+glColor3f(0,1,0);
+ddaline(xmin,ymin,xmax,ymin);
+ddaline(xmax,ymin,xmax,ymax);
+ddaline(xmax,ymax,xmin,ymax);
+ddaline(xmin,ymax,xmin,ymin);
+
+glEnd();
+glFlush();
+}
+
+int main(int argc,char**argv)
+{
+
+printf("first  :");
+scanf("%d%d",&p1.x,&p1.y);
+printf("second  :");
+scanf("%d%d",&p2.x,&p2.y);
+
+printf("xmin  :");
+scanf("%d",&xmin);
+printf("ymin  :");
+scanf("%d",&ymin);
+printf("xmax :");
+scanf("%d",&xmax);
+printf("ymax  :");
+scanf("%d",&ymax);
+
+calculate(&p1);
+calculate(&p2);
+
+int i;
+for(i=0;i<4;i++)
+{
+  printf("%d",p1.outcode[i]);
+  }
+  
+  printf("\n");
+  
+  for(i=0;i<4;i++)
+{
+  printf("%d",p2.outcode[i]);
+  }
+  
+    int flag=0;
+    for( i=0;i<4;i++)
+   {
+     if(p1.outcode[i]==1 || p2.outcode[i]==1)
+        {
+        flag=1;
+        break;
+        }
+       }
+    if(flag==0)
+    {
+      printf("\nAccepted");
+      }
+      else
+      {
+      int result[4];
+      
+      for( i=0;i<4;i++)
+      {
+          result[i]=p1.outcode[i]&&p2.outcode[i];
+          }
+        int flag1=0;
+        for(i=0;i<4;i++)
+   {
+     if(result[i]==1)
+        {
+        flag1=1;
+        break;
+        }
+       }
+      if(flag1==1)
+      {
+      printf("\nRejected:");
+      }
+      else
+      {
+      
+       printf("\nPartially accepted: ");
+       }
+     }
+    
+
+
+
+
+
+
+glutInit(&argc,argv);
+glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+glutInitWindowPosition(0,0);
+glutInitWindowSize(640,480);
+glutCreateWindow("draw");
+
+glClearColor(1,1,1,0);
+glColor3f(1,0,0);
+
+gluOrtho2D(0,640,0,480);
+glutDisplayFunc(draw);
+glutMainLoop();
+
+return 0;
+
+}
