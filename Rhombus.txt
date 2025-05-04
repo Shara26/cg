@@ -1,0 +1,147 @@
+#include <stdio.h>
+#include <GL/glut.h>
+
+int xa, ya, xb, yb;
+int click = 0;
+
+void BresenhamLine(int xa, int ya, int xb, int yb)
+{
+    int dx, dy, d;
+    int c, r, f;
+
+    dx = xb - xa;
+    dy = yb - ya;
+
+    if (abs(dx) > abs(dy)) {
+        d = 2 * abs(dy) - abs(dx);
+
+        if (dx > 0) {
+            c = xa;
+            r = ya;
+            f = xb;
+        } else {
+            c = xb;
+            r = yb;
+            f = xa;
+        }
+
+        while (f > c) {
+            if (d < 0) {
+                c = c + 1;
+                d = d + 2 * abs(dy);
+            } else {
+                if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0)) {
+                    r = r + 1;
+                } else {
+                    r = r - 1;
+                }
+                c = c + 1;
+                d = d + 2 * abs(dy) - 2 * abs(dx);
+            }
+            glVertex2d(c, r);
+        }
+    } else {
+        d = 2 * abs(dx) - abs(dy);
+
+        if (dy > 0) {
+            c = xa;
+            r = ya;
+            f = yb;
+        } else {
+            c = xb;
+            r = yb;
+            f = ya;
+        }
+
+        while (f > r) {
+            if (d < 0) {
+                r = r + 1;
+                d = d + 2 * abs(dx);
+            } else {
+                if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0)) {
+                    c = c + 1;
+                } else {
+                    c = c - 1;
+                }
+                r = r + 1;
+                d = d + 2 * abs(dx) - 2 * abs(dy);
+            }
+            glVertex2d(c, r);
+        }
+    }
+}
+
+void draw() {
+    int x1, y1, x2, y2, x3, y3;
+
+    x1 = (xa + xb) / 2;
+    y1 = (ya + yb) / 2;
+
+    x2 = (x1 + xa) / 2;
+    y2 = (y1 + ya) / 2;
+
+    x3 = (x1 + xb) / 2;
+    y3 = (y1 + yb) / 2;
+
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glBegin(GL_LINES);
+
+    BresenhamLine(xa, ya, xb, ya);
+    BresenhamLine(xb, ya, xb, yb);
+    BresenhamLine(xb, yb, xa, yb);
+    BresenhamLine(xa, yb, xa, ya);
+
+    BresenhamLine(x1, ya, xb, y1);
+    BresenhamLine(xb, y1, x1, yb);
+    BresenhamLine(x1, yb, xa, y1);
+    BresenhamLine(xa, y1, x1, ya);
+
+    BresenhamLine(x2, y2, x3, y2);
+    BresenhamLine(x3, y2, x3, y3);
+    BresenhamLine(x3, y3, x2, y3);
+    BresenhamLine(x2, y3, x2, y2);
+
+    glEnd();
+    glFlush();
+}
+
+void mouseClick(int button, int state, int x, int y) {
+    y = 480 - y;
+
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        if (click == 0) {
+            xa = x;
+            ya = y;
+            printf("first point: (%d,%d)\n", xa, ya);
+            click++;
+        } else {
+            xb = x;
+            yb = y;
+            printf("second point: (%d,%d)\n", xb, yb);
+            click++;
+
+            draw();
+        }
+    }
+}
+
+int main(int argc, char **argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowPosition(0, 0);
+    glutInitWindowSize(640, 480);
+    glutCreateWindow("Mouse Interfacing Example");
+
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glColor3f(1.0, 1.0, 1.0);
+
+    gluOrtho2D(0, 640, 0, 480);
+
+    glutDisplayFunc(draw);
+    glutMouseFunc(mouseClick);
+
+    glutMainLoop();
+
+    return 0;
+}
