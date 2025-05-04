@@ -113,3 +113,29 @@ int i;
 
     return 0;
 }
+
+/*Enter number of Vertices: 4
+
+X: 100  
+Y: 100  
+
+X: 200  
+Y: 100  
+
+X: 200  
+Y: 200  
+
+X: 100  
+Y: 200  
+
+Enter Inside Point - X: 150  
+Enter Inside Point - Y: 150  
+
+Background Color [0]: 1  
+Background Color [1]: 1  
+Background Color [2]: 1  
+
+Fill Color [0]: 1  
+Fill Color [1]: 0  
+Fill Color [2]: 0 */ 
+
